@@ -166,7 +166,7 @@ PROGN."
   (first (letf-expander bindings body)))
 
 ;; Example:
-;; (letf ((#'test (lambda (x) (format t \"woo ~a~%\" x)))
+;; (letf ((#'test (x) (format t \"woo ~a~%\" x))
 ;;        (b 1)
 ;;        (c (+ 1 2)))
 ;;   (test \"oh\")
