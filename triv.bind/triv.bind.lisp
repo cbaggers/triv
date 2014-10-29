@@ -114,20 +114,21 @@ PROGN."
 
 
 (defun lambda-list-split (template lam-list)
-  (labels ((collector (lam-list &optional current-modifier accum)
-             (let ((item (first lam-list)))
-               (cond ((null lam-list) accum) 
-                     ((and (symbolp item) (eql (elt (symbol-name item) 0) #\&))
-                      (collector (rest lam-list)
-                                 (utils:symbolicate-package :keyword item)
-                                 accum))
-                     (t (collector (rest lam-list)
-                                   current-modifier
-                                   (acons current-modifier 
-                                          (cons item 
-                                                (cdr (assoc current-modifier
-                                                            accum)))
-                                          accum))))))
+  (labels ((kwd (x) (intern (format nil "~a" x) :keyword))
+           (collector (lam-list &optional current-modifier accum)
+                (let ((item (first lam-list)))
+                  (cond ((null lam-list) accum) 
+                        ((and (symbolp item) (eql (elt (symbol-name item) 0) #\&))
+                         (collector (rest lam-list)
+                                    (kwd item)
+                                    accum))
+                        (t (collector (rest lam-list)
+                                      current-modifier
+                                      (acons current-modifier 
+                                             (cons item 
+                                                   (cdr (assoc current-modifier
+                                                               accum)))
+                                             accum))))))
            (clean-alist (alist &optional accum)
              (let ((item (first alist)))
                (cond ((null alist) accum)
@@ -136,7 +137,7 @@ PROGN."
                       (clean-alist (rest alist) (cons item accum)))
                      (t (clean-alist (rest alist) accum)))))
            (first-in-template (x) (member (first x) template)))
-    (let ((template (when template (cons nil (mapcar #'utils:kwd template))))
+    (let ((template (when template (cons nil (mapcar #'kwd template))))
           (split (collector lam-list)))
       (if (or (null template)
               (every #'first-in-template split))
@@ -161,13 +162,13 @@ PROGN."
                         ,@(letf-expander (rest bindings) body)))))))))
 
 (defmacro letf (bindings &body body)
-  "An extended let form which combines labels and let
-Example:
-(letf ((#'test (lambda (x) (format t "woo ~a~%" x)))
-       (b 1)
-       (c (+ 1 2)))
-  (test "oh")
-  (test (+ b c)))"
+  "An extended let form which combines labels and let"
   (first (letf-expander bindings body)))
 
+;; Example:
+;; (letf ((#'test (lambda (x) (format t \"woo ~a~%\" x)))
+;;        (b 1)
+;;        (c (+ 1 2)))
+;;   (test \"oh\")
+;;   (test (+ b c)))
 ;;------------------------------------------------------------
