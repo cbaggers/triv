@@ -1,3 +1,5 @@
+DONT USE THIS. All of this is to be broken up and put into quickutil.
+
 The trivial packages (triv.*) exist for a stupid reason. They exist because each time I pull in some bundle of utils I dont like how many of them I'm not using. This is the worst kind of premature optimization but I still waste a few seconds each time thinking about it. 
 
 Right now, in the absence of some solution which strips utils based on use, I have decided to at least make the packages as granular as possible.
